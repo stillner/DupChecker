@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JFrame;
+
+import org.moll_illner.dupChecker.ui.MainWindow;
+
 public class DupChecker {
 
     public static void main(String[] args) {
@@ -23,6 +27,10 @@ public class DupChecker {
                 }
             }
         }
+        
+        MainWindow w = new MainWindow();
+        w.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        w.setVisible(true);
     }
 
 }
