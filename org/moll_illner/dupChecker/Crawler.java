@@ -4,8 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 public class Crawler {
     private List<StartingPoint> _startingPoints;
@@ -32,20 +34,33 @@ public class Crawler {
         if ((startingPoint != null) && (filesBySizeMap != null)) {
             File f = new File(startingPoint.getPath());
             if (f.isDirectory()) {
-                File[] files = f.listFiles();
-                for (File s: files) {
-                    if (!s.isDirectory()) {
-                        FileRef fr = new FileRef(s);
-                        if (!filesBySizeMap.containsKey(s.length()))
-                        {
-                            List<FileRef> newSizeList = new ArrayList<FileRef>();
-                            filesBySizeMap.put(s.length(), newSizeList);
+                Queue<File> directories = new LinkedList<File>();
+                directories.add(f);
+                File currentDir;
+                while ((currentDir = directories.poll()) != null) {
+                    File[] files = currentDir.listFiles();
+                    for (File s: files) {
+                        if (s.isDirectory()) {
+                            directories.add(s);
                         }
-                        filesBySizeMap.get(s.length()).add(fr);
+                        else {
+                            recordFile(s, filesBySizeMap);
+                        }
                     }
                 }
             }
         }
+    }
+    
+    
+    private void recordFile(File file, Map<Long, List<FileRef>> filesBySizeMap) {
+        FileRef fr = new FileRef(file);
+        if (!filesBySizeMap.containsKey(file.length()))
+        {
+            List<FileRef> newSizeList = new ArrayList<FileRef>();
+            filesBySizeMap.put(file.length(), newSizeList);
+        }
+        filesBySizeMap.get(file.length()).add(fr);
     }
     
     private void removeNonDuplicateEntries(Map<Long, List<FileRef>> filesBySizeMap) {

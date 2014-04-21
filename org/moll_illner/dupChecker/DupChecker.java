@@ -12,7 +12,7 @@ public class DupChecker {
 
     public static void main(String[] args) {
         List<StartingPoint> startingPoints = new ArrayList<StartingPoint>();
-        startingPoints.add(new StartingPoint("/home/stillner/dupdir"));
+        startingPoints.add(new StartingPoint("/home/stillner/Anja"));
         Crawler crawler = new Crawler(startingPoints);
         Map<Long, List<FileRef>> duplicateFilesBySize = crawler.crawl();
         if (duplicateFilesBySize != null) {
