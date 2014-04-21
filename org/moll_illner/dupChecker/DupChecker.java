@@ -14,9 +14,9 @@ public class DupChecker {
         List<StartingPoint> startingPoints = new ArrayList<StartingPoint>();
         startingPoints.add(new StartingPoint("/home/stillner/dupdir"));
         Crawler crawler = new Crawler(startingPoints);
-        Map<Long, List<FileRef>> duplicates = crawler.crawl();
-        if (duplicates != null) {
-            for (Map.Entry<Long, List<FileRef>> entry: duplicates.entrySet()) {
+        Map<Long, List<FileRef>> duplicateFilesBySize = crawler.crawl();
+        if (duplicateFilesBySize != null) {
+            for (Map.Entry<Long, List<FileRef>> entry: duplicateFilesBySize.entrySet()) {
                 System.out.println();
                 System.out.println(entry.getKey());
                 List<FileRef> files = entry.getValue();
@@ -29,7 +29,8 @@ public class DupChecker {
         }
         
         MainWindow w = new MainWindow();
-        w.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        w.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        w.displayFiles(duplicateFilesBySize);
         w.setVisible(true);
     }
 
