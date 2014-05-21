@@ -1,5 +1,6 @@
 package org.moll_illner.dupChecker.ui;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -13,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import org.moll_illner.dupChecker.FileRef;
 
@@ -23,6 +25,7 @@ public class MainWindow extends JFrame implements ActionListener {
     
     public MainWindow() {
         
+    	setLayout(new BorderLayout());
         setSize(600, 400);
 
         JMenuBar menuBar = new JMenuBar();
@@ -31,14 +34,14 @@ public class MainWindow extends JFrame implements ActionListener {
         JMenu fileMenu = new JMenu("File");
         menuBar.add(fileMenu);
         
-        JPanel mainPanel = new JPanel();
-        this.add(mainPanel);
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        this.add(mainPanel, BorderLayout.CENTER);
         
         _rootNode = new DefaultMutableTreeNode("Root node");
         JTree tree = new JTree(_rootNode);
         JScrollPane scrollPane = new JScrollPane(tree);
         
-        mainPanel.add(scrollPane);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
         
         _quitMenuItem = new JMenuItem("Quit");
         fileMenu.add(_quitMenuItem);
@@ -69,6 +72,7 @@ public class MainWindow extends JFrame implements ActionListener {
                     _rootNode.add(sizeNode);
                 }
             }
+            
         }
 
     }
