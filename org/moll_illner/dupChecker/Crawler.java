@@ -28,7 +28,7 @@ public class Crawler {
     }
     
     /*
-     * TODO Recursively traverse directory
+     * Recursively traverse directory
      */
     private void crawl(StartingPoint startingPoint, Map<Long, List<FileRef>> filesBySizeMap) {
         if ((startingPoint != null) && (filesBySizeMap != null)) {
@@ -44,7 +44,7 @@ public class Crawler {
                             directories.add(s);
                         }
                         else {
-                            recordFile(s, filesBySizeMap);
+                            processFile(s, filesBySizeMap, startingPoint);
                         }
                     }
                 }
@@ -53,15 +53,27 @@ public class Crawler {
     }
     
     
-    private void recordFile(File file, Map<Long, List<FileRef>> filesBySizeMap) {
+    private void processFile(File file, Map<Long, List<FileRef>> filesBySizeMap, StartingPoint startingPoint) {
         FileRef fr = new FileRef(file);
-        if (!filesBySizeMap.containsKey(file.length()))
+    	if ((startingPoint.getMinSize() != null) && (fr.length() < startingPoint.getMinSize())) {
+    		return;
+    	}
+    	if ((startingPoint.getMaxSize() != null) && (fr.length() > startingPoint.getMaxSize())) {
+    		return;
+    	}
+    	recordFile(fr, filesBySizeMap);
+    }
+    
+    
+    private void recordFile(FileRef fileRef, Map<Long, List<FileRef>> filesBySizeMap) {
+        if (!filesBySizeMap.containsKey(fileRef.length()))
         {
             List<FileRef> newSizeList = new ArrayList<FileRef>();
-            filesBySizeMap.put(file.length(), newSizeList);
+            filesBySizeMap.put(fileRef.length(), newSizeList);
         }
-        filesBySizeMap.get(file.length()).add(fr);
+        filesBySizeMap.get(fileRef.length()).add(fileRef);
     }
+    
     
     private void removeNonDuplicateEntries(Map<Long, List<FileRef>> filesBySizeMap) {
         if (filesBySizeMap != null) {
