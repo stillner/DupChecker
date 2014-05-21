@@ -10,6 +10,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -35,7 +36,9 @@ public class MainWindow extends JFrame implements ActionListener {
         
         _rootNode = new DefaultMutableTreeNode("Root node");
         JTree tree = new JTree(_rootNode);
-        mainPanel.add(tree);
+        JScrollPane scrollPane = new JScrollPane(tree);
+        
+        mainPanel.add(scrollPane);
         
         _quitMenuItem = new JMenuItem("Quit");
         fileMenu.add(_quitMenuItem);
@@ -54,15 +57,17 @@ public class MainWindow extends JFrame implements ActionListener {
     public void displayFiles(Map<Long, List<FileRef>> filesBySize) {
         if (filesBySize != null) {
             for (Map.Entry<Long, List<FileRef>> entry: filesBySize.entrySet()) {
-                DefaultMutableTreeNode sizeNode = new DefaultMutableTreeNode(entry.getKey().toString());
                 List<FileRef> files = entry.getValue();
                 if (files != null) {
+                	DefaultMutableTreeNode sizeNode = 
+                		new DefaultMutableTreeNode(entry.getKey().toString() + " (" + files.size() + ")");
+                
                     for (FileRef f: files) {
                         DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(f.getPath());
                         sizeNode.add(fileNode);
                     }
+                    _rootNode.add(sizeNode);
                 }
-                _rootNode.add(sizeNode);
             }
         }
 
