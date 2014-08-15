@@ -11,16 +11,18 @@ import java.util.Queue;
 
 public class Crawler {
     private List<StartingPoint> _startingPoints;
+    FilterCrit _filterCrit;
     
-    public Crawler(List<StartingPoint> startingPoints) {
+    public Crawler(List<StartingPoint> startingPoints, FilterCrit filterCrit) {
         _startingPoints = startingPoints;
+        _filterCrit = filterCrit;
     }
     
     public Map<Long, List<FileRef>> crawl() {
         Map<Long, List<FileRef>> duplicates = new HashMap<Long, List<FileRef>>();
         if (_startingPoints != null) {
             for (StartingPoint sp: _startingPoints) {
-                crawl(sp, duplicates);
+                crawl(sp, duplicates, _filterCrit);
             }
         }
         removeNonDuplicateEntries(duplicates);
@@ -30,7 +32,8 @@ public class Crawler {
     /*
      * Recursively traverse directory
      */
-    private void crawl(StartingPoint startingPoint, Map<Long, List<FileRef>> filesBySizeMap) {
+    private void crawl(StartingPoint startingPoint, Map<Long, List<FileRef>> filesBySizeMap,
+    		FilterCrit filterCrit) {
         if ((startingPoint != null) && (filesBySizeMap != null)) {
             File f = new File(startingPoint.getPath());
             if (f.isDirectory()) {
@@ -44,7 +47,7 @@ public class Crawler {
                             directories.add(s);
                         }
                         else {
-                            processFile(s, filesBySizeMap, startingPoint);
+                            processFile(s, filesBySizeMap, startingPoint, filterCrit);
                         }
                     }
                 }
@@ -53,12 +56,13 @@ public class Crawler {
     }
     
     
-    private void processFile(File file, Map<Long, List<FileRef>> filesBySizeMap, StartingPoint startingPoint) {
+    private void processFile(File file, Map<Long, List<FileRef>> filesBySizeMap, 
+    		StartingPoint startingPoint, FilterCrit filterCrit) {
         FileRef fr = new FileRef(file);
-    	if ((startingPoint.getMinSize() != null) && (fr.length() < startingPoint.getMinSize())) {
+    	if ((filterCrit.getMinSize() != null) && (fr.length() < filterCrit.getMinSize())) {
     		return;
     	}
-    	if ((startingPoint.getMaxSize() != null) && (fr.length() > startingPoint.getMaxSize())) {
+    	if ((filterCrit.getMaxSize() != null) && (fr.length() > filterCrit.getMaxSize())) {
     		return;
     	}
     	recordFile(fr, filesBySizeMap);
@@ -81,9 +85,54 @@ public class Crawler {
             while (iter.hasNext()) {
                 Map.Entry<Long, List<FileRef>> entry = iter.next();
                 List<FileRef> fileList = entry.getValue();
-                if ((fileList == null) || (fileList.size() < 2))
+                if ((fileList == null) || (fileList.size() < 2)) {
                     iter.remove();
                 }
             }
+        }
+    }
+    
+    
+    public Map<Long, Map<String, List<FileRef>>> groupByCRC(Map<Long, List<FileRef>> filesBySizeMap) {
+    	Map<Long, Map<String, List<FileRef>>> retval = new HashMap<Long, Map<String, List<FileRef>>>();
+        if (filesBySizeMap != null) {
+            Iterator<Map.Entry<Long, List<FileRef>>> iter = filesBySizeMap.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<Long, List<FileRef>> entry = iter.next();
+                List<FileRef> fileList = entry.getValue();
+                Map<String, List<FileRef>> filesByCRC = new HashMap<String, List<FileRef>>();
+                if (fileList != null) {
+                	// group by CRC
+                	for (FileRef fileRef : fileList) {
+						try {
+							fileRef.calculateMD5();
+							if (!filesByCRC.containsKey(fileRef.getMD5())) {
+								filesByCRC.put(fileRef.getMD5(), new ArrayList<FileRef>());
+							}
+							filesByCRC.get(fileRef.getMD5()).add(fileRef);
+						}
+						catch (Exception ex) {
+							// Log.Error
+						}
+					}
+
+                	// remove groups with only one entry
+                	Iterator<Map.Entry<String, List<FileRef>>> crcGroupIterator = filesByCRC.entrySet().iterator();
+                	while (crcGroupIterator.hasNext()) {
+                		Map.Entry<String, List<FileRef>> crcGroupEntry = crcGroupIterator.next();
+                		if (crcGroupEntry.getValue().size() < 2) {
+                			crcGroupIterator.remove();
+                		}
+                	}
+                	
+                	if (filesByCRC.size() > 0) {
+                		Long fileSize = entry.getKey();
+                		retval.put(fileSize, filesByCRC);
+                	}
+
+                }
+            }
+        }
+        return retval;
     }
 }
