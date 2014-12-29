@@ -18,25 +18,29 @@ public class DupChecker {
             // StartingPoint sp = new StartingPoint("d:\\p\\DupChecker");
             StartingPoint sp = new StartingPoint("/home/stillner/dupdir");
             startingPoints.add(sp);
-            sp.setMinSize(1l);
-            Crawler crawler = new Crawler(startingPoints);
+            FilterCrit filterCrit = new FilterCrit();
+            filterCrit.setMinSize(1l);
+            Crawler crawler = new Crawler(startingPoints, filterCrit);
             Map<Long, List<FileRef>> duplicateFilesBySize = crawler.crawl();
-            if (duplicateFilesBySize != null) {
-                for (Map.Entry<Long, List<FileRef>> entry: duplicateFilesBySize.entrySet()) {
-                    System.out.println();
-                    System.out.println(entry.getKey());
-                    List<FileRef> files = entry.getValue();
-                    if (files != null) {
-                        for (FileRef f: files) {
-                            System.out.println(" " + f.getPath());
-                        }
-                    }
-                }
-            }
-            
+            Map<Long, Map<String, List<FileRef>>> duplicateFilesBySizeAndCRC = crawler.groupByCRC(duplicateFilesBySize);
+
+            //        if (duplicateFilesBySize != null) {
+            //            for (Map.Entry<Long, List<FileRef>> entry: duplicateFilesBySize.entrySet()) {
+            //                System.out.println();
+            //                System.out.println(entry.getKey());
+            //                List<FileRef> files = entry.getValue();
+            //                if (files != null) {
+            //                    for (FileRef f: files) {
+            //                        System.out.println(" " + f.getPath());
+            //                    }
+            //                }
+            //            }
+            //        }
+
             MainWindow w = new MainWindow();
             w.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            w.displayFiles(duplicateFilesBySize);
+            //w.displayFiles(duplicateFilesBySize);
+            w.displayFilesBySizeAndCRC(duplicateFilesBySizeAndCRC);
             w.setVisible(true);
         }
         catch (Exception ex) {
