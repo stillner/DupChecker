@@ -24,7 +24,6 @@ public class MainWindow extends JFrame implements ActionListener {
     private DefaultMutableTreeNode _rootNode;
     
     public MainWindow() {
-        
     	setLayout(new BorderLayout());
         setSize(600, 400);
 
@@ -39,6 +38,7 @@ public class MainWindow extends JFrame implements ActionListener {
         
         _rootNode = new DefaultMutableTreeNode("Root node");
         JTree tree = new JTree(_rootNode);
+        tree.addMouseListener(new TreeContextMenu());
         JScrollPane scrollPane = new JScrollPane(tree);
         
         mainPanel.add(scrollPane, BorderLayout.CENTER);
