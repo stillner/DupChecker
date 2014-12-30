@@ -20,8 +20,15 @@ public class TreeContextMenu extends MouseInputAdapter {
         }
         
         tree.setSelectionPath(path);
-        String obj = path.getLastPathComponent().getClass().toString();
-        String label = "The object is a " + obj; //.getTreeLabel();
+        Object obj = path.getLastPathComponent();
+        if (obj == null) {
+            return;
+        }
+        if (!(obj instanceof FileTreeNode)) {
+            return;
+        }
+        FileTreeNode node = (FileTreeNode)obj;
+        String label = node.getFilepath();
         JPopupMenu popup = new JPopupMenu();
         popup.add(new JMenuItem(label));
         popup.show(tree, x, y);
@@ -29,11 +36,15 @@ public class TreeContextMenu extends MouseInputAdapter {
     
     
     public void mousePressed(MouseEvent e) {
-        if (e.isPopupTrigger()) myPopupEvent(e);
+        if (e.isPopupTrigger()) {
+            myPopupEvent(e);
+        }
     }
     
     
     public void mouseReleased(MouseEvent e) {
-        if (e.isPopupTrigger()) myPopupEvent(e);
+        if (e.isPopupTrigger()) {
+            myPopupEvent(e);
+        }
     }
 }

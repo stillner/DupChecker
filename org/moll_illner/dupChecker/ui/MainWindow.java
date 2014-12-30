@@ -103,8 +103,7 @@ public class MainWindow extends JFrame implements ActionListener {
                                     new DefaultMutableTreeNode(fileEntry.getKey().toString() + " (" + files.size() + ")");
 
                             for (FileRef f: files) {
-                                DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(f.getPath());
-
+                                FileTreeNode fileNode = new FileTreeNode(f.getPath());
                                 crcNode.add(fileNode);
                             }
                             sizeNode.add(crcNode);
