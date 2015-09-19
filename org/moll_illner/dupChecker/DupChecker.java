@@ -14,13 +14,15 @@ public class DupChecker {
 
     public static void main(String[] args) {
         try {
-            List<StartingPoint> startingPoints = new ArrayList<StartingPoint>();
+            Configuration configuration = new Configuration();
+            String path = "/home/stillner/prj/DupChecker/dupCheckerConfig-honk.xml";
+            configuration.readConfiguration(path);
             // StartingPoint sp = new StartingPoint("d:\\p\\DupChecker");
-            StartingPoint sp = new StartingPoint("/home/stillner/dupdir");
-            startingPoints.add(sp);
+            //StartingPoint sp = new StartingPoint("/home/stillner/dupdir");
+            //startingPoints.add(sp);
             FilterCrit filterCrit = new FilterCrit();
             filterCrit.setMinSize(1l);
-            Crawler crawler = new Crawler(startingPoints, filterCrit);
+            Crawler crawler = new Crawler(configuration.getStartingPoints(), filterCrit);
             Map<Long, List<FileRef>> duplicateFilesBySize = crawler.crawl();
             Map<Long, Map<String, List<FileRef>>> duplicateFilesBySizeAndCRC = crawler.groupByCRC(duplicateFilesBySize);
 
